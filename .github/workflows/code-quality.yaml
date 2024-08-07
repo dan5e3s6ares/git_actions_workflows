@@ -5,16 +5,19 @@ on:
     platform:
       required: true
       type: string
-    version:
-      required: true
-      type: string
     python_poetry_export_opts:
       required: true
       type: string
       default: "--with dev --without-hashes"
+    inputs:
+      min_coverage:
+        description: "Minimum code coverage percentage required"
+        required: false
+        default: "75"
+        type: string
 
 env:
-  MIN_COVERAGE_REQUIRED: 75
+  MIN_COVERAGE_REQUIRED: ${{ inputs.min_coverage }}
 
 jobs:
   python-test-check:
