@@ -2,9 +2,6 @@ name: Check Python application
 
 on:
   workflow_call:
-    platform:
-      required: true
-      type: string
     python_poetry_export_opts:
       required: true
       type: string
@@ -28,7 +25,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        if: ${{ inputs.platform == 'python' }}
         uses: actions/setup-python@v4
         with:
           cache: "pip"
@@ -37,15 +33,13 @@ jobs:
           python-version: ${{ inputs.version }}
 
       - name: Install dependencies (Python)
-        if: ${{ inputs.platform == 'python' }}
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          poetry export ${{ inputs.python_poetry_export_opts }} > requirements.txt
+          poetry export --without-hashes --format=requirements.txt > requirements.txt
           pip install --no-deps -r requirements.txt
 
       - name: Set locale
-        if: ${{ inputs.platform == 'python' }}
         run: |
           sudo locale-gen pt_BR.UTF-8
           sudo update-locale LANG=pt_BR.UTF-8
