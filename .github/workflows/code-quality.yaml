@@ -1,0 +1,56 @@
+name: Check Python application
+
+on:
+  workflow_call:
+    platform:
+      required: true
+      type: string
+    version:
+      required: true
+      type: string
+    python_poetry_export_opts:
+      required: true
+      type: string
+      default: "--with dev --without-hashes"
+
+env:
+  MIN_COVERAGE_REQUIRED: 75
+
+jobs:
+  python-test-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: ${{ inputs.platform == 'python' }}
+        uses: actions/setup-python@v4
+        with:
+          cache: "pip"
+          cache-dependency-path: |
+            poetry.lock
+          python-version: ${{ inputs.version }}
+
+      - name: Install dependencies (Python)
+        if: ${{ inputs.platform == 'python' }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry export ${{ inputs.python_poetry_export_opts }} > requirements.txt
+          pip install --no-deps -r requirements.txt
+
+      - name: Set locale
+        if: ${{ inputs.platform == 'python' }}
+        run: |
+          sudo locale-gen pt_BR.UTF-8
+          sudo update-locale LANG=pt_BR.UTF-8
+
+      - name: Github Action for testing the code
+        run: coverage run -m unittest discover
+
+      - name: Github Action to retrieve coverage percentage
+        id: total-coverage
+        run: |
+          coverage json -q -o /dev/stdout | python -c 'import sys, json; perc_cov = json.load(sys.stdin)["totals"]["percent_covered"]; is_covered = perc_cov >= '$MIN_COVERAGE_REQUIRED'; print("Coverage is: ", perc_cov); sys.exit(not is_covered)'
