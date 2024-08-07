@@ -2,10 +2,6 @@ name: Check Python application
 
 on:
   workflow_call:
-    python_poetry_export_opts:
-      required: true
-      type: string
-      default: "--with dev --without-hashes"
     inputs:
       min_coverage:
         description: "Minimum code coverage percentage required"
