@@ -26,12 +26,13 @@ jobs:
           cache: "pip"
           cache-dependency-path: |
             poetry.lock
-          python-version: ${{ inputs.version }}
+          python-version: "3.12.3"
 
       - name: Install dependencies (Python)
         run: |
           python -m pip install --upgrade pip
           pip install poetry
+          pip install coverage
           poetry export --without-hashes --format=requirements.txt > requirements.txt
           pip install --no-deps -r requirements.txt
 
