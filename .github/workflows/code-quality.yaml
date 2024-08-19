@@ -6,7 +6,7 @@ on:
       min_coverage:
         description: "Minimum code coverage percentage required"
         required: false
-        default: "75"
+        default: "80"
         type: string
 
 env:
